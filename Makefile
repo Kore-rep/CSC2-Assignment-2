@@ -14,6 +14,7 @@ $(BINDIR)/%.class:$(SRCDIR)/%.java
 
 CLASSES= \
 	Terrain.class \
+	Water.class \
 	FlowPanel.class \
 	Flow.class
 	

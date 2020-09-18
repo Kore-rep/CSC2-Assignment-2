@@ -29,12 +29,13 @@ public class Water {
     }
 
     public void addWater(int x, int y) {
+        int radius = 3;
         // Loop and +3 the value of every coordinate in a 3 block radius
-        for (int i = -3; i < 3; i ++) {
-            for (int j = -3; j < 3; j++) {
+        for (int i = -radius; i < radius; i ++) {
+            for (int j = -radius; j < radius; j++) {
                 // If a valid coordinate
                 if (x + i >= 0 && x + i <= dimx - 1  && y + j >= 0 && y + j <= dimy - 1) {
-                    waterDepth[x + i][y + j] += 3;
+                    waterDepth[x + i][y + j] += 1;
                 }
             }
         }
@@ -82,6 +83,7 @@ public class Water {
         for (int[] row: waterDepth){
             Arrays.fill(row, 0);
         }
+        this.deriveImg();
     }
 
     // Remove the water from all edges.

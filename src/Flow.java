@@ -74,13 +74,14 @@ public class Flow {
 			public void actionPerformed(ActionEvent e){
 				// to do reset simulation
 				w.reset();
+				fp.paused = true;
+				fp.repaint();
 			}
 		});
 		playB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				// to do resume threads
 				fp.paused = false;
-				runSim(landdata, w);
 				
 			}
 		});
@@ -129,56 +130,47 @@ public class Flow {
 		//runSim(landdata, waterSim);
 	}
 
-	public static void runSim(Terrain t, Water w) {
-		int x1 = t.getDimX();
-		int y1 = t.getDimY();
-		int counter = 0;
+	public static void runSimStep(Terrain t, Water w) {
 		/* One sim Step is:
 			Clear Edges of Water
 			Traverse permuted locations
 			Adjust water
 		*/
-		int[] inds = new int[2];
-		while(counter < 10) {
-			counter++;
-			fp.repaint();
-			System.out.println(counter);
-			if (fp.paused) {
-				continue;
-			}
+		
+		for (int i = 0; i < t.dim(); i ++) {
 			w.clearEdges();
-			for (int i = 0; i < x1*y1; i ++) {
-				t.getPermute(i, inds);
-				// If not on an edge
-				if (inds[0] == 0 || inds[0] == x1 - 1 || inds[1] == 0 || inds[1] == y1 - 1) {
-                    continue;
-                } else {
-                    // If it has water
-                    if (w.waterDepth[inds[0]][inds[1]] != 0) {
-                        float lowSur;
-                        float compSur;
-                        int[] low = new int[2];
-                        low[0] = inds[0];
-                        low[1] = inds[1];
-                        for (int j = -1; j < 2; j++) {
-                            for (int k = -1; k < 2; k++) {
-								// Loop in a square around the given coords, to determine
-								// lowest neighboring point.
-                                lowSur = t.height[low[0]][low[1]] + (float) 0.01 * w.getDepth(low[0], low[1]);
-                                compSur = t.height[inds[0] + j][inds[1] + k]
-                                        + (float) 0.01 * w.getDepth(inds[0] + j, inds[1] + k);
-
-                                if (compSur < lowSur) {
-                                    low[0] = inds[0] + j;
-                                    low[1] = inds[1] + k;
-                                }
-                            }
-
-                        }
-                        w.shiftWater(inds[0], inds[1], low[0], low[1]);
-                	}
+			int[] inds = new int[2];
+			t.getPermute(i, inds);
+               // If it has water
+            if (w.waterDepth[inds[0]][inds[1]] != 0) {
+                float lowSur;
+                float compSur;
+                int[] low = new int[2];
+                low[0] = inds[0];
+                low[1] = inds[1];
+				for (int j = -1; j < 2; j++) {
+					for (int k = -1; k < 2; k++) {
+						// Loop in a square around the given coords, to determine
+						// lowest neighboring point.
+						lowSur = t.height[low[0]][low[1]] + (float) 0.01 * w.getDepth(low[0], low[1]);
+						compSur = t.height[inds[0] + j][inds[1] + k]
+								+ (float) 0.01 * w.getDepth(inds[0] + j, inds[1] + k);
+						if (compSur < lowSur) {
+							low[0] = inds[0] + j;
+							low[1] = inds[1] + k;
+						}
+					}
 				}
+				w.shiftWater(inds[0], inds[1], low[0], low[1]);
 			}
+			//System.out.println("running");
+			/*try {
+				System.out.println("Waiting");
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} */
+			
 		}
 	}
 }
