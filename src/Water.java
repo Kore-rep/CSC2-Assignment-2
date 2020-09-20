@@ -30,12 +30,13 @@ public class Water {
 
     public void addWater(int x, int y) {
         int radius = 3;
+        int amount = 1;
         // Loop and +3 the value of every coordinate in a 3 block radius
         for (int i = -radius; i < radius; i ++) {
             for (int j = -radius; j < radius; j++) {
                 // If a valid coordinate
                 if (x + i >= 0 && x + i <= dimx - 1  && y + j >= 0 && y + j <= dimy - 1) {
-                    waterDepth[x + i][y + j] += 1;
+                    waterDepth[x + i][y + j] += amount;
                 }
             }
         }
@@ -88,6 +89,8 @@ public class Water {
 
     // Remove the water from all edges.
     void clearEdges() {
+
+        // Cant combine into 1 loop becuase of non-square grids
         for (int i = 0; i < dimx; i++) {
             waterDepth[0][i] = 0;
             waterDepth[dimx - 1][i] = 0;

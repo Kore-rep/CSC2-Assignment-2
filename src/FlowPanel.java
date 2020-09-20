@@ -5,7 +5,7 @@ public class FlowPanel extends JPanel implements Runnable {
 	Terrain land;
 	Water water;
 	volatile Boolean paused = true;
-	int counter = 0;
+	int simCounter = 0;
 	
 	FlowPanel(Terrain terrain, Water w) {
 		land=terrain;
@@ -42,8 +42,9 @@ public class FlowPanel extends JPanel implements Runnable {
 			if (this.paused) {
 				continue;
 			}
-			System.out.println(counter);
-			counter++;
+			System.out.println(simCounter);
+			Flow.setStep(simCounter);
+			simCounter++;
 			Flow.runSimStep(land, water);
 			//System.out.println("Not Stuck");
 
@@ -54,4 +55,5 @@ public class FlowPanel extends JPanel implements Runnable {
 		} 
 		
 	}
+
 }
