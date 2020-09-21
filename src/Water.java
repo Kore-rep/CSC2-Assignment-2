@@ -1,5 +1,6 @@
 import java.awt.image.*;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.awt.Color;
 
 /**
@@ -8,7 +9,7 @@ import java.awt.Color;
  * and updated to represent movement
  */
 public class Water {
-    int[][] waterDepth; // Array parallel to Terrain containing water unit values
+    AtomicInteger[][] waterDepth; // Array parallel to Terrain containing water unit values
     int dimx, dimy; // Dimensions of water array
     volatile BufferedImage img; 
 
@@ -20,8 +21,8 @@ public class Water {
     public Water(int x1, int y1) {
         dimx = x1;
         dimy = y1;
-        waterDepth = new int[dimx][dimy];
-        deriveImg();
+        waterDepth = new AtomicInteger[dimx][dimy];
+        this.reset();
     }
 
     /**
@@ -38,7 +39,7 @@ public class Water {
      * @param y Y coordiante to check
      * @return Integer with the depth of the water at given location
      */
-    synchronized public int getDepth(int x, int y) {
+    synchronized public AtomicInteger getDepth(int x, int y) {
         return waterDepth[x][y];
     }
 
@@ -55,7 +56,7 @@ public class Water {
             for (int j = -radius; j < radius; j++) {
                 // If a valid coordinate
                 if (x + i >= 0 && x + i <= dimx - 1  && y + j >= 0 && y + j <= dimy - 1) {
-                    waterDepth[x + i][y + j] += amount;
+                    waterDepth[x + i][y + j].getAndAdd(amount);
                 }
             }
         }
@@ -70,8 +71,8 @@ public class Water {
      * @param destY Y coordinate of dest
      */
     synchronized public void shiftWater(int baseX, int baseY, int destX, int destY) {
-        waterDepth[baseX][baseY]--;
-        waterDepth[destX][destY]++;
+        waterDepth[baseX][baseY].getAndDecrement();
+        waterDepth[destX][destY].getAndIncrement();
         
     }
 
@@ -95,7 +96,7 @@ public class Water {
         for(int x=0; x < dimx; x++) {
 			for(int y=0; y < dimy; y++) {
                 // Set to blue where there is water
-                if (waterDepth[x][y] > 0) {
+                if (waterDepth[x][y].get() > 0) {
 
 				    Color col = Color.BLUE;
                     ximg.setRGB(x, y, col.getRGB());
@@ -112,8 +113,10 @@ public class Water {
      */
     void reset() {
         this.img = null;
-        for (int[] row: waterDepth){
-            Arrays.fill(row, 0);
+        for (int j = 0; j < dimx; j++){
+            for (int i = 0; i < dimy; i++) {
+                waterDepth[j][i] = new AtomicInteger(0);
+            }
         }
         this.deriveImg();
     }
@@ -125,13 +128,13 @@ public class Water {
 
         // Cant combine into 1 loop becuase of non-square grids
         for (int i = 0; i < dimx; i++) {
-            waterDepth[0][i] = 0;
-            waterDepth[dimx - 1][i] = 0;
+            waterDepth[0][i].set(0);
+            waterDepth[dimx - 1][i].set(0);
 
         }
         for (int i = 0; i < dimy; i++) {
-            waterDepth[i][0] = 0;
-            waterDepth[i][dimy - 1] = 0;
+            waterDepth[i][0].set(0);
+            waterDepth[i][dimy - 1].set(0);
 
         } 
     }

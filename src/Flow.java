@@ -161,7 +161,7 @@ public class Flow {
 			if (inds[0] == 0 || inds[0] == t.getDimX()-1 || inds[1] == 0 || inds[1] == t.getDimY()-1) {
 				continue;
 			} else {
-				if (w.getDepth(inds[0], inds[1]) != 0) {
+				if (w.getDepth(inds[0], inds[1]).get() != 0) {
 					//System.out.println("water at: " + inds[0] +" " + inds[1]);
 					float lowSur;
 					float compSur;
@@ -172,9 +172,9 @@ public class Flow {
 						for (int k = -1; k < 2; k++) {
 							// Loop in a square around the given coords, to determine
 							// lowest neighboring point.
-							lowSur = t.height[low[0]][low[1]] + (float) 0.01 * w.getDepth(low[0], low[1]);
+							lowSur = t.height[low[0]][low[1]] + (float) 0.01 * w.getDepth(low[0], low[1]).get();
 							compSur = t.height[inds[0] + j][inds[1] + k]
-									+ (float) 0.01 * w.getDepth(inds[0] + j, inds[1] + k);
+									+ (float) 0.01 * w.getDepth(inds[0] + j, inds[1] + k).get();
 							if (compSur < lowSur) {
 								low[0] = inds[0] + j;
 								low[1] = inds[1] + k;

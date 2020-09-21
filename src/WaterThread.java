@@ -48,7 +48,7 @@ public class WaterThread extends java.lang.Thread {
                     continue;
                 } else {
                     // If it has water
-                    if (water.getDepth(ind[0], ind[1]) != 0) {                       
+                    if (water.getDepth(ind[0], ind[1]).get() != 0) {                       
                         
                         low[0] = ind[0];
                         low[1] = ind[1];
@@ -58,9 +58,9 @@ public class WaterThread extends java.lang.Thread {
                                 // needs to flow.
                                 // Has to update original surface each time in case
                                 // water flows out.
-                                lowSur = land.height[low[0]][low[1]] + (float) 0.01 * water.getDepth(low[0], low[1]);
+                                lowSur = land.height[low[0]][low[1]] + (float) 0.01 * water.getDepth(low[0], low[1]).get();
                                 compSur = land.height[ind[0] + j][ind[1] + k]
-                                        + (float) 0.01 * water.getDepth(ind[0] + j, ind[1] + k);
+                                        + (float) 0.01 * water.getDepth(ind[0] + j, ind[1] + k).get();
 
                                 if (compSur < lowSur) {
                                     low[0] = ind[0] + j;
