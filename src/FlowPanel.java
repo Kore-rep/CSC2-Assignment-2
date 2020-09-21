@@ -1,19 +1,31 @@
 import java.awt.Graphics;
 import javax.swing.JPanel;
 
+/**
+ * Handles displaying the GUI and updating the images for water running
+ */
 public class FlowPanel extends JPanel implements Runnable {
 	Terrain land;
 	Water water;
 	volatile Boolean paused = true;
 	int simCounter = 0;
+	Master m;
+
+	/**
+	 * Main Constructor for FlowPanel
+	 * @param terrain A Terrain object
+	 * 
+	 */
 	
-	FlowPanel(Terrain terrain, Water w) {
+	FlowPanel(Terrain terrain, Water w, Master master) {
 		land=terrain;
 		water=w;
+		m = master;
 	}
 		
-	// responsible for painting the terrain and water
-	// as images
+	/**
+	 * Paints the water and terrain as images
+	 */
 	@Override
     protected void paintComponent(Graphics g) {
 		int width = getWidth();
@@ -31,6 +43,11 @@ public class FlowPanel extends JPanel implements Runnable {
 		}
 	}
 	
+
+	/**
+	 * Executes simulation steps, redrawing and counts simulation steps 
+	 * and allows for pausing
+	 */
 	public void run() {	
 		// display loop here
 		// to do: this should be controlled by the GUI
@@ -38,19 +55,17 @@ public class FlowPanel extends JPanel implements Runnable {
 		
 		while(true) {
 			
-			//repaint();
 			if (this.paused) {
 				continue;
 			}
-			System.out.println(simCounter);
 			Flow.setStep(simCounter);
 			simCounter++;
-			Flow.runSimStep(land, water);
-			//System.out.println("Not Stuck");
-
+			// Sequential
+			// Flow.runSimStep(land, water);
+			m.runSimStep();
+			
 			repaint();
-			//try { Thread.sleep(50); } catch (InterruptedException e) {e.printStackTrace(); }
-			//repaint();
+			//try { Thread.sleep(); } catch (InterruptedException e) {e.printStackTrace(); }
 			
 		} 
 		

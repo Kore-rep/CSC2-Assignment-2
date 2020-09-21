@@ -30,7 +30,7 @@ public class Water {
 
     public void addWater(int x, int y) {
         int radius = 3;
-        int amount = 1;
+        int amount = 3;
         // Loop and +3 the value of every coordinate in a 3 block radius
         for (int i = -radius; i < radius; i ++) {
             for (int j = -radius; j < radius; j++) {
@@ -47,8 +47,8 @@ public class Water {
     synchronized public void shiftWater(int baseX, int baseY, int destX, int destY) {
         waterDepth[baseX][baseY]--;
         waterDepth[destX][destY]++;
-        updateImg();
-        //System.out.println("Moved water");
+        //updateImg();
+        
     }
 
     // Generates initial blank image, only used on construction
@@ -59,7 +59,7 @@ public class Water {
 
     // Updates the image to have blue where there is water
     // To be called every time water moves or is created
-    synchronized void updateImg() { 
+    void updateImg() { 
         BufferedImage ximg = this.img;
 
         for(int x=0; x < dimx; x++) {
@@ -75,7 +75,6 @@ public class Water {
 			}
         }
         this.img = ximg;
-        //System.out.println("Updated Water Image!");
     }
 
     // Set image to null and the array back to 0s

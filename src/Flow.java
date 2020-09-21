@@ -13,6 +13,7 @@ public class Flow {
 	static int frameY;
 	static FlowPanel fp;
 	static JLabel stepCounter;
+	static Master m;
 
 	// start timer
 	private static void tick(){
@@ -24,7 +25,15 @@ public class Flow {
 		return (System.currentTimeMillis() - startTime) / 1000.0f; 
 	}
 	
-	public static void setupGUI(int frameX,int frameY,Terrain landdata, Water w) {
+	/**
+	 * Intializes the GUI components and adds functionality
+	 * @param frameX X Dimension of window
+	 * @param frameY Y Dimension of window
+	 * @param landdata A Terrain object for creating the FlowPanel
+	 * @param w A Water object for creating the flowpanel and for use in the buttons
+	 * @param master A Master object to allow controlling of threads and creating of FlowPanel
+	 */
+	public static void setupGUI(int frameX,int frameY,Terrain landdata, Water w, Master master) {
 		
 		Dimension fsize = new Dimension(800, 800);
     	JFrame frame = new JFrame("Waterflow"); 
@@ -34,11 +43,10 @@ public class Flow {
       	JPanel g = new JPanel();
         g.setLayout(new BoxLayout(g, BoxLayout.PAGE_AXIS)); 
    
-		fp = new FlowPanel(landdata, w);
+		fp = new FlowPanel(landdata, w, master);
 		fp.setPreferredSize(new Dimension(frameX,frameY));
 		g.add(fp);
 	    
-		// to do: add a MouseListener, buttons and ActionListeners on those buttons
 		fp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -69,6 +77,7 @@ public class Flow {
 			public void actionPerformed(ActionEvent e){
 				// to do ask threads to stop
 				frame.dispose();
+				m.terminateThreads();
 				
 			}
 		});
@@ -79,12 +88,15 @@ public class Flow {
 				fp.simCounter = 0;
 				fp.paused = true;
 				fp.repaint();
+				//m.resetAll();
 			}
 		});
+
 		playB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				// to do resume threads
 				fp.paused = false;
+								
 				
 			}
 		});
@@ -124,14 +136,15 @@ public class Flow {
 		// landscape information from file supplied as argument
 		// 
 		landdata.readData(args[0]);
-		Water waterSim = new Water(landdata.getDimX(), landdata.getDimY());
-		
+		Water waterSim = new Water(landdata.getDimX(), landdata.getDimY());	
+		m = new Master(landdata, waterSim);	
 		frameX = landdata.getDimX();
 		frameY = landdata.getDimY();
-		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata, waterSim));
+		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata, waterSim, m));
 		
 		// to do: initialise and start simulation
 		//runSim(landdata, waterSim);
+		
 	}
 
 	public static void runSimStep(Terrain t, Water w) {
