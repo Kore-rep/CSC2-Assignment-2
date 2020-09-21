@@ -2,7 +2,11 @@ import java.awt.image.*;
 import java.util.Arrays;
 import java.awt.Color;
 
-
+/**
+ * A class representing water depth across a set of points
+ * Generates an image to be overlaid on the terrain image
+ * and updated to represent movement
+ */
 public class Water {
     int[][] waterDepth; // Array parallel to Terrain containing water unit values
     int dimx, dimy; // Dimensions of water array
@@ -20,14 +24,29 @@ public class Water {
         deriveImg();
     }
 
+    /**
+     * Obtain the current iteration of the image
+     * @return BufferedImage of the current image
+     */
     public BufferedImage getImage() {
         return img;
     }
 
+    /**
+     * Checks how much water is at a location
+     * @param x X coordinate to check
+     * @param y Y coordiante to check
+     * @return Integer with the depth of the water at given location
+     */
     synchronized public int getDepth(int x, int y) {
         return waterDepth[x][y];
     }
 
+    /**
+     * Adds water in a radius around given point
+     * @param x X coordinate of point to add
+     * @param y Y coordinate of point to add
+     */
     public void addWater(int x, int y) {
         int radius = 3;
         int amount = 3;
@@ -43,22 +62,33 @@ public class Water {
         updateImg();
     }
 
-    // Moves 1 unit of water from baseCoords to destCoords
+    /**
+     * Moves 1 unit of water from baseCoords to destCoords
+     * @param baseX X coordinate of base
+     * @param baseY Y coordinate of base
+     * @param destX X coordinate of dest
+     * @param destY Y coordinate of dest
+     */
     synchronized public void shiftWater(int baseX, int baseY, int destX, int destY) {
         waterDepth[baseX][baseY]--;
         waterDepth[destX][destY]++;
-        //updateImg();
         
     }
 
-    // Generates initial blank image, only used on construction
+     
+    /**
+     * Generates initial blank image, only used on construction
+     */
     void deriveImg() {
         img = new BufferedImage(dimx, dimy, BufferedImage.TYPE_INT_ARGB);
-		// Generate image
     }
 
-    // Updates the image to have blue where there is water
-    // To be called every time water moves or is created
+    /**
+     * Updates the image to have blue where there is water 
+     * and set transparent where there isn't
+     * 
+     * Gets called after every cycle of work is complete
+     */
     void updateImg() { 
         BufferedImage ximg = this.img;
 
@@ -77,7 +107,9 @@ public class Water {
         this.img = ximg;
     }
 
-    // Set image to null and the array back to 0s
+    /**
+     * Set the image to null and restore 0s in the array of water depth
+     */
     void reset() {
         this.img = null;
         for (int[] row: waterDepth){
@@ -86,7 +118,9 @@ public class Water {
         this.deriveImg();
     }
 
-    // Remove the water from all edges.
+    /**
+     * Sets the water depth to 0 on all the edges.
+     */
     void clearEdges() {
 
         // Cant combine into 1 loop becuase of non-square grids

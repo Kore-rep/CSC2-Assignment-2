@@ -1,16 +1,21 @@
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * A thread class for implementation of parallel water simulation
+ */
 public class WaterThread extends java.lang.Thread {
     int[] indexes;
     Terrain land;
     Water water;
     int dimx, dimy;
-    AtomicBoolean finished;
     Master master;
 
+    /**
+     * Main constructor for WaterThread
+     * @param t Terrain object to get information from
+     * @param w Water object to manipulate
+     * @param ind An index of size 2, with a lower and upper bound of indexes to traverse
+     * @param m Master object to use for synchronization
+     */
     public WaterThread(Terrain t, Water w, int[] ind, Master m) {
         indexes = ind;
         land = t;
@@ -18,22 +23,24 @@ public class WaterThread extends java.lang.Thread {
         dimx = land.getDimX();
         dimy = land.getDimY();
         master = m;
-        //System.out.println(getName() + ": " + indexes[0] + " -> " + indexes[1]);
     }
 
+    /**
+     * Does 1 unit of work, then notifies master that it is finished
+     * and waits to be notified
+     */
     public void run() {
         int[] low = new int[2];
         float lowSur;
         float compSur;
         int[] ind = new int[2];
-        //System.out.println("Started " + this.getName() + "  " + this.indexes[0] + " -> " + this.indexes[1]);
         
         while (true) {
             
 
             for (int i = indexes[0]; i < indexes[1]; i++) {
                 
-                 // Loop through all grid coords
+                // Loop through all grid coords
                 // Generate new coords to check
                 land.getPermute(i, ind);
                 // If this set isn't on any edges
@@ -41,9 +48,7 @@ public class WaterThread extends java.lang.Thread {
                     continue;
                 } else {
                     // If it has water
-                    if (water.getDepth(ind[0], ind[1]) != 0) {
-                        //System.out.println("Looping water " + this.getName());
-                        
+                    if (water.getDepth(ind[0], ind[1]) != 0) {                       
                         
                         low[0] = ind[0];
                         low[1] = ind[1];
@@ -65,12 +70,11 @@ public class WaterThread extends java.lang.Thread {
 
                         }
                         water.shiftWater(ind[0], ind[1], low[0], low[1]);
-                        //System.out.println(this.getName() + " moved water (" + ind[0] + ", " + ind[1] + ") -> (" + low[0] + ", " + low[1] + ")");
                     }
                 }
             }
 
-            master.completedThreads.getAndIncrement();
+            master.completedThreads.getAndIncrement(); // Notify Master then wait
             try { synchronized(this) { wait(); } } catch (InterruptedException e) { return; }
         }
         

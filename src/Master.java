@@ -107,6 +107,7 @@ public class Master {
 
     /**
      * Kill threads and recreate them
+     * Auxillary Method, not implemented currently
      */
     public void resetAll() {
         started = false;

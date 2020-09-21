@@ -14,16 +14,6 @@ public class Flow {
 	static FlowPanel fp;
 	static JLabel stepCounter;
 	static Master m;
-
-	// start timer
-	private static void tick(){
-		startTime = System.currentTimeMillis();
-	}
-	
-	// stop timer, return time elapsed in seconds
-	private static float tock(){
-		return (System.currentTimeMillis() - startTime) / 1000.0f; 
-	}
 	
 	/**
 	 * Intializes the GUI components and adds functionality
@@ -46,7 +36,8 @@ public class Flow {
 		fp = new FlowPanel(landdata, w, master);
 		fp.setPreferredSize(new Dimension(frameX,frameY));
 		g.add(fp);
-	    
+		
+		// For tracking mouse clicks
 		fp.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -55,7 +46,9 @@ public class Flow {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				// mouse released action	
+				// mouse released action\
+				// Determines the location of the click, adds water and calls repaint() 
+				// in case the simulation is paused	
 				int xCo = e.getX();
 				int yCo = e.getY();
 				w.addWater(xCo, yCo);
@@ -63,38 +56,38 @@ public class Flow {
 		 	}
 		});
 
+		// Declare buttons and other components
 		JPanel b = new JPanel();
 		b.setLayout(new BoxLayout(b, BoxLayout.LINE_AXIS));
-		stepCounter = new JLabel("Simulation Step: ");
+		stepCounter = new JLabel("Simulation Step: "); // Label for tracking simulation steps
 		JButton endB = new JButton("End");
 		JButton resetB = new JButton("Reset");
 		JButton playB = new JButton("Play");
 		JButton pauseB = new JButton("Pause");
 
 
-		// add the listener to the jbutton to handle the "pressed" event
 		endB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				// to do ask threads to stop
-				frame.dispose();
+			// Requests the threads to sop and terminate the GUI frame
+			frame.dispose();
 				m.terminateThreads();
 				
 			}
 		});
 		resetB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				// to do reset simulation
+				// Resets the simulation
 				w.reset();
 				fp.simCounter = 0;
 				fp.paused = true;
 				fp.repaint();
-				//m.resetAll();
 			}
 		});
 
 		playB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				// to do resume threads
+				// Unpauses the FlowPanel, allowing threads to continue work and 
+				// repainting to begin again
 				fp.paused = false;
 								
 				
@@ -102,7 +95,7 @@ public class Flow {
 		});
 		pauseB.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				// to do pause
+				// Pauses the flowpanel, stopping repainting and the threads continuing work
 				fp.paused = true;
 			}
 		});
@@ -136,17 +129,23 @@ public class Flow {
 		// landscape information from file supplied as argument
 		// 
 		landdata.readData(args[0]);
+
+		// Construct Water and Master objects
 		Water waterSim = new Water(landdata.getDimX(), landdata.getDimY());	
 		m = new Master(landdata, waterSim);	
+
 		frameX = landdata.getDimX();
 		frameY = landdata.getDimY();
 		SwingUtilities.invokeLater(()->setupGUI(frameX, frameY, landdata, waterSim, m));
 		
-		// to do: initialise and start simulation
-		//runSim(landdata, waterSim);
 		
 	}
 
+	/**
+	 * A sequential implementation of the simulation
+	 * @param t Terrain object to get information from
+	 * @param w Water object to manipulate
+	 */
 	public static void runSimStep(Terrain t, Water w) {
 		/* One sim Step is:
 			Clear Edges of Water
@@ -154,9 +153,7 @@ public class Flow {
 			Adjust water
 		*/
 		w.clearEdges();
-		int counter = 0;
 		for (int i = 0; i < t.dim(); i ++) {
-			counter++;
 			int[] inds = new int[2];
 			t.getPermute(i, inds);
 			   // Not on an edge 
@@ -199,6 +196,10 @@ public class Flow {
 		}
 	}
 
+	/**
+	 * Sets the text of the GUI component for counting simulation steps
+	 * @param x The value of the current step
+	 */
 	static void setStep(int x) {
 		stepCounter.setText("Simulation Step: " + x);
 	}
