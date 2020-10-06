@@ -11,17 +11,22 @@ The Pause and Play buttons pause and unpause the simulation.
 The Reset button will remove all the water and reset the step counter to 0.
 
 To compile:
+
     > make
 
 To run:
-    For a medium sized grid:
+
+   For a medium sized grid:
+   
     > make runMed 
 
-    For a large sized grid:
+   For a large sized grid:
+   
     > make runLarge
 
 To regenerate docs:
-    >make docs
+
+    > make docs
 
 To clean all class files
 
