@@ -1,5 +1,7 @@
 # CSC2-Assignment-2
-
+---------------
+This code is horribly coded and needs to be updated, but remains up for preservation
+---------------
 A water flow simulation created by Angus Longmore - LNGANG002
 
 Reads in height data from data/ and converts it into a greyscale image.
